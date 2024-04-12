@@ -1,0 +1,33 @@
+---
+title: "The effects of aclhocl "
+author: "Your Name"
+date: "2022-12-31"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot) 
+
+
+# Load the data
+```
+# Data Cleaning
+```{r}
+df <- read_csv("Stats survey.csv")
+
+# Function to check if all columns are filled
+check_filled <- function(data) 
+  # Apply the complete.cases function to the data frame
+  # This function returns a logical vector indicating which rows have no missing values
+    df_complete <- df[complete.cases(df), ]
+  
+  # Subset the data frame to only include complete rows
+    df_complete <- df[complete_rows, ]
+  
+  # Return the new data frame
+  return(df_complete)
+
+
+# Use the function on your data
+data_complete <- check_filled(data)
