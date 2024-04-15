@@ -27,7 +27,6 @@ check_filled <- function(data)
   
   # Return the new data frame
   return(df_complete)
-
-
+```
 # Use the function on your data
 data_complete <- check_filled(data)
