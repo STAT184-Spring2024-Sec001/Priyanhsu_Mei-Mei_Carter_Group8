@@ -1,32 +1,81 @@
 ---
-title: "The effects of aclhocl "
-author: "Your Name"
+title: "The effects of alchol "
+authors: "Priyanshu Dey, "
 date: "2022-12-31"
 output: html_document
 ---
 
+
+# Data Access
 ```{r}
 library(tidyverse)
-library(ggplot) 
+library(dplyr)
 
-
+data <- read_csv("Stats survey.csv")
 # Load the data
+# Inspect the data structure
+glimpse(data)
+# View the first few rows of the dataset
+head(data)
+view(data)
 ```
-# Data Cleaning
-```{r}
-df <- read_csv("Stats survey.csv")
 
-# Function to check if all columns are filled
-check_filled <- function(data) 
-  # Apply the complete.cases function to the data frame
-  # This function returns a logical vector indicating which rows have no missing values
-    df_complete <- df[complete.cases(df), ]
-  
-  # Subset the data frame to only include complete rows
-    df_complete <- df[complete_rows, ]
-  
-  # Return the new data frame
-  return(df_complete)
+# Data Wrangling
+```{r}
+
+# Function to replace '4+' with 5 (or another assumption)
+handle_plus4 <- function(x) {
+  x <- as.character(x)
+  x[grep("\\+$", x)] <- "5"  # Replace '4+' with '5'
+  as.numeric(x)
+
+}
+# Apply the function to relevant columns
+data$On_a_night_out_how_many_alcoholic_drinks_do_you_consume <- handle_plus4(data$On_a_night_out_how_many_alcoholic_drinks_do_you_consume)
+
+# Fill in missing data with specified rules
+df <- data %>%
+  mutate(`What year were you in last year (2023)?` = ifelse(is.na(`What year were you in last year (2023)?`), "HS", `What year were you in last year (2023)?`),
+         `Your Matric (grade 12) Average/ GPA (in %)` = ifelse(is.na(`Your Matric (grade 12) Average/ GPA (in %)`), "NA (first year)", `Your Matric (grade 12) Average/ GPA (in %)`),
+         `Your Accommodation Status Last Year (2023)` = ifelse(is.na(`Your Accommodation Status Last Year (2023)`), NA, `Your Accommodation Status Last Year (2023)`),
+         `Monthly Allowance in 2023` = ifelse(is.na(`Monthly Allowance in 2023`), NA, `Monthly Allowance in 2023`),
+         `Were you on scholarship/bursary in 2023?` = ifelse(is.na(`Were you on scholarship/bursary in 2023?`), "HS", `Were you on scholarship/bursary in 2023?`),
+         `How many modules have you failed thus far into your studies?` = ifelse(is.na(`How many modules have you failed thus far into your studies?`), "HS", `How many modules have you failed thus far into your studies?`))
+
+# View processed data
+head(df)
+View(df)  
+
 ```
-# Use the function on your data
-data_complete <- check_filled(data)
+
+Had to clean some of the data the data itself had a lot of differnt blanks and non nummerical values that we had to filiter out.
+# Data Visualization
+```{r}
+
+# Creating the plot
+ggplot(data, aes(x = Drinks_Consumed, y = Classes_Skipped, size = Nights_Out, color = Nights_Out)) +
+  geom_point(alpha = 0.7) +
+  scale_size_continuous(name = "Nights Out (times per week)", range = c(2, 10)) +
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(
+    title = "Relationship Between Alcohol Consumption, Classes Skipped, and Nights Out",
+    x = "Number of Drinks Consumed",
+    y = "Number of Classes Skipped",
+    caption = "Data collected from survey"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+###Smother
+```{r}
+ggplot(data, aes(x = Drinks_Consumed, y = Classes_Skipped)) +
+  geom_point(aes(color = Nights_Out), alpha = 0.6) +  # Points with transparency
+  geom_smooth(method = "lm", se = FALSE, color = "black") +  # Linear regression line
+  geom_density_2d_filled(contour_var = "ndensity", h = c(1, 1)) +  # Density contours
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(title = "Analysis of Drinking Behavior and Class Attendance",
+       x = "Number of Drinks",
+       y = "Classes Skipped",
+       color = "Nights Out") +
+  theme_minimal()
+```
