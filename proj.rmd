@@ -1,9 +1,10 @@
 ---
-title: "The Effects of Alcohol"
-authors: "Priyanshu Dey"
+title: "The effects of alchol "
+authors: "Priyanshu Dey, "
 date: "2022-12-31"
 output: html_document
 ---
+
 
 # Data Access
 ```{r}
@@ -17,8 +18,8 @@ data <- read_csv("Stats survey.csv")
 glimpse(data)
 
 # View the first few rows of the dataset
-names(data)
-
+head(data)
+view(data)
 ```
 # Data Wrangling
 ```{r}
