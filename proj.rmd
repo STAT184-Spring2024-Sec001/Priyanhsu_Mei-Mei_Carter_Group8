@@ -1,81 +1,91 @@
 ---
-title: "The effects of alchol "
-authors: "Priyanshu Dey, "
+title: "The Effects of Alcohol"
+authors: "Priyanshu Dey"
 date: "2022-12-31"
 output: html_document
 ---
 
-
 # Data Access
 ```{r}
 library(tidyverse)
-library(dplyr)
+library(readr)
 
-data <- read_csv("Stats survey.csv")
 # Load the data
+data <- read_csv("Stats survey.csv")
+
 # Inspect the data structure
 glimpse(data)
-# View the first few rows of the dataset
-head(data)
-view(data)
-```
 
+# View the first few rows of the dataset
+names(data)
+
+```
 # Data Wrangling
 ```{r}
+# Correctly referencing and renaming the columns as necessary
+data <- rename(data,
+               Year_in_2023 = `What year were you in last year (2023) ?`,
+               Drinks_Consumed = `On a night out, how many alcoholic drinks do you consume?`,
+               Classes_Missed = `How many classes do you miss per week due to alcohol reasons, (i.e: being hungover or too tired?)`,
+               Socialising_Frequency = `How often do you go out partying/socialising during the week?`)
 
-# Function to replace '4+' with 5 (or another assumption)
-handle_plus4 <- function(x) {
-  x <- as.character(x)
-  x[grep("\\+$", x)] <- "5"  # Replace '4+' with '5'
-  as.numeric(x)
-
-}
-# Apply the function to relevant columns
-data$On_a_night_out_how_many_alcoholic_drinks_do_you_consume <- handle_plus4(data$On_a_night_out_how_many_alcoholic_drinks_do_you_consume)
-
-# Fill in missing data with specified rules
+# Handling missing data and data transformation
 df <- data %>%
-  mutate(`What year were you in last year (2023)?` = ifelse(is.na(`What year were you in last year (2023)?`), "HS", `What year were you in last year (2023)?`),
-         `Your Matric (grade 12) Average/ GPA (in %)` = ifelse(is.na(`Your Matric (grade 12) Average/ GPA (in %)`), "NA (first year)", `Your Matric (grade 12) Average/ GPA (in %)`),
-         `Your Accommodation Status Last Year (2023)` = ifelse(is.na(`Your Accommodation Status Last Year (2023)`), NA, `Your Accommodation Status Last Year (2023)`),
-         `Monthly Allowance in 2023` = ifelse(is.na(`Monthly Allowance in 2023`), NA, `Monthly Allowance in 2023`),
-         `Were you on scholarship/bursary in 2023?` = ifelse(is.na(`Were you on scholarship/bursary in 2023?`), "HS", `Were you on scholarship/bursary in 2023?`),
-         `How many modules have you failed thus far into your studies?` = ifelse(is.na(`How many modules have you failed thus far into your studies?`), "HS", `How many modules have you failed thus far into your studies?`))
+  mutate(
+    Year_in_2023 = ifelse(is.na(Year_in_2023), "HS", Year_in_2023),
+    Drinks_Consumed = as.numeric(gsub("\\D", "", Drinks_Consumed)),  # Remove all non-digit characters and convert to numeric
+    Socialising_Frequency = case_when(
+      Socialising_Frequency == "Only weekends" ~ "3",
+      TRUE ~ as.character(Socialising_Frequency)
+    ),
+    Socialising_Frequency = as.numeric(Socialising_Frequency)
+  )
 
-# View processed data
+# View the transformed data structure and first few rows to confirm changes
+glimpse(df)
 head(df)
-View(df)  
-
 ```
 
 Had to clean some of the data the data itself had a lot of differnt blanks and non nummerical values that we had to filiter out.
 # Data Visualization
 ```{r}
+df <- df %>%
+  filter(!is.na(Drinks_Consumed), !is.na(Classes_Missed))
 
-# Creating the plot
-ggplot(data, aes(x = Drinks_Consumed, y = Classes_Skipped, size = Nights_Out, color = Nights_Out)) +
-  geom_point(alpha = 0.7) +
-  scale_size_continuous(name = "Nights Out (times per week)", range = c(2, 10)) +
-  scale_color_gradient(low = "blue", high = "red") +
+df$Drinks_Consumed <- cut(df$Drinks_Consumed, breaks = c(-Inf, 3, 8, Inf), labels = c("1-3", "4-8", "8+"))
+
+ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
+    geom_bar(stat = "identity")+
   labs(
-    title = "Relationship Between Alcohol Consumption, Classes Skipped, and Nights Out",
-    x = "Number of Drinks Consumed",
-    y = "Number of Classes Skipped",
-    caption = "Data collected from survey"
+    x = "Drinks Consumed per night",
+    y = "Classes Missed",
+    title = "Bar Graph of Classes of Missed based on number of drinks consumed "
   ) +
-  theme_minimal() +
-  theme(legend.position = "right")
+  scale_x_discrete(limits = c("1-3", "4-8", "8+"))
+
 ```
+
 ###Smother
 ```{r}
-ggplot(data, aes(x = Drinks_Consumed, y = Classes_Skipped)) +
-  geom_point(aes(color = Nights_Out), alpha = 0.6) +  # Points with transparency
-  geom_smooth(method = "lm", se = FALSE, color = "black") +  # Linear regression line
-  geom_density_2d_filled(contour_var = "ndensity", h = c(1, 1)) +  # Density contours
-  scale_color_gradient(low = "blue", high = "red") +
-  labs(title = "Analysis of Drinking Behavior and Class Attendance",
-       x = "Number of Drinks",
-       y = "Classes Skipped",
-       color = "Nights Out") +
+# Ensure both columns are factors
+df$Drinks_Consumed <- as.factor(df$Drinks_Consumed)
+df$Classes_Missed <- as.factor(df$Classes_Missed)
+
+# Perform Chi-square test
+chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
+chi_square_test
+
+print(df$Classes_Missed)
+
+ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
+  geom_hex() +
+  labs(
+    title = "Hexbin Plot of Drinks Consumed vs. Classes Missed",
+    x = "Drinks Consumed (Numeric Approximation)",
+    y = "Classes Missed"
+  ) +
   theme_minimal()
+
+
+
 ```
