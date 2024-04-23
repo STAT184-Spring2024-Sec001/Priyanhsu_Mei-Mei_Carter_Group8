@@ -72,6 +72,7 @@ ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
 df$Drinks_Consumed <- as.factor(df$Drinks_Consumed)
 df$Classes_Missed <- as.factor(df$Classes_Missed)
 
+
 # Perform Chi-square test
 chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
 chi_square_test
