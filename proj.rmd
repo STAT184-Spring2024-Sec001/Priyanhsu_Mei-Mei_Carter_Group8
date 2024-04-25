@@ -6,7 +6,7 @@ output: html_document
 ---
 
 
-# Data Access
+# Data Access, loading librarirs
 ```{r}
 library(tidyverse)
 library(readr)
@@ -30,7 +30,7 @@ data <- rename(data,
                Classes_Missed = `How many classes do you miss per week due to alcohol reasons, (i.e: being hungover or too tired?)`,
                Socialising_Frequency = `How often do you go out partying/socialising during the week?`)
 
-# Handling missing data and data transformation
+# Cleaning missing data and data transformation
 df <- data %>%
   mutate(
     Year_in_2023 = ifelse(is.na(Year_in_2023), "HS", Year_in_2023),
@@ -69,11 +69,14 @@ ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
 ###Smother
 ```{r}
 # Ensure both columns are factors
+# Convert the 'Drinks_Consumed' and 'Classes_Missed' columns in the dataframe 'df' to factor type.
+# This is typically done to prepare categorical data for statistical tests and visualizations.
 df$Drinks_Consumed <- as.factor(df$Drinks_Consumed)
 df$Classes_Missed <- as.factor(df$Classes_Missed)
 
 
-# Perform Chi-square test
+# Perform a Chi-square test of independence to evaluate if there is a significant association
+# between the number of drinks consumed and classes missed. This is a common test for categorical data.
 chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
 chi_square_test
 
