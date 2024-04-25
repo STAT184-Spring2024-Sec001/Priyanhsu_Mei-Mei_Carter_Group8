@@ -81,7 +81,8 @@ chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
 chi_square_test
 
 print(df$Classes_Missed)
-
+# Create a hexbin plot using ggplot2 package, plotting 'Drinks_Consumed' on the x-axis and 'Classes_Missed' on the y-axis.
+# Hexbin plots are useful for visualizing the density of data points when there are many overlapping points in a scatter plot.
 ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
   geom_hex() +
   labs(
