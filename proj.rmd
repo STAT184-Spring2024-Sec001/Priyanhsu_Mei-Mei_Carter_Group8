@@ -5,13 +5,8 @@ date: "2022-12-31"
 output: html_document
 ---
 
-<<<<<<< HEAD
 # Data Access
 
-=======
-
-# Data Access, loading librarirs
->>>>>>> fc7c34a8fab49cf8fbea0673dcac17d2cceed0aa
 ```{r}
 library(tidyverse)
 # Summarize the data
@@ -33,10 +28,6 @@ data <- rename(data,
                Socialising_Frequency = `How often do you go out partying/socialising during the week?`,
                Avg_GPA = 'Your 2023 academic year average/GPA in % (Ignore if you are 2024 1st year student)')
 
-<<<<<<< HEAD
-=======
-# Cleaning missing data and data transformation
->>>>>>> fc7c34a8fab49cf8fbea0673dcac17d2cceed0aa
 df <- data %>%
   mutate(
     Year_in_2023 = ifelse(is.na(Year_in_2023), "HS", Year_in_2023),
@@ -70,7 +61,6 @@ ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed, fill = Drinks_Consumed))
 cleaned_df <- df %>%
   filter(!is.na(Socialising_Frequency) & !is.na(Avg_GPA))
 
-<<<<<<< HEAD
 ggplot(cleaned_df, aes(x = Socialising_Frequency, y = Avg_GPA)) +
   geom_point() +
   labs(title = "Relationship Between Socialising Frequency and GPA", x = "Socialising Frequency", y = "GPA (%)") +
@@ -82,25 +72,6 @@ ggplot(cleaned_df, aes(x = `Avg_GPA`)) +
   labs(title = "Density Plot of GPA", x = "GPA (%)") +
   theme_minimal()
 #Hex plot
-=======
-###Smother
-```{r}
-# Ensure both columns are factors
-# Convert the 'Drinks_Consumed' and 'Classes_Missed' columns in the dataframe 'df' to factor type.
-# This is typically done to prepare categorical data for statistical tests and visualizations.
-df$Drinks_Consumed <- as.factor(df$Drinks_Consumed)
-df$Classes_Missed <- as.factor(df$Classes_Missed)
-
-
-# Perform a Chi-square test of independence to evaluate if there is a significant association
-# between the number of drinks consumed and classes missed. This is a common test for categorical data.
-chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
-chi_square_test
-
-print(df$Classes_Missed)
-# Create a hexbin plot using ggplot2 package, plotting 'Drinks_Consumed' on the x-axis and 'Classes_Missed' on the y-axis.
-# Hexbin plots are useful for visualizing the density of data points when there are many overlapping points in a scatter plot.
->>>>>>> fc7c34a8fab49cf8fbea0673dcac17d2cceed0aa
 ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
   geom_hex() +
   scale_fill_gradient(low = "lightblue", high = "darkblue") + # Change colors here
