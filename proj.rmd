@@ -1,40 +1,37 @@
 ---
-title: "The effects of alchol "
-authors: "Priyanshu Dey, "
+title: "The Effects of Alcohol"
+authors: "Priyanshu Dey"
 date: "2022-12-31"
 output: html_document
 ---
 
-
 # Data Access
+
 ```{r}
 library(tidyverse)
-library(readr)
-
+# Summarize the data
+library(knitr)  
 # Load the data
 data <- read_csv("Stats survey.csv")
 
-# Inspect the data structure
+# Inspect and view the data structure
 glimpse(data)
-
-# View the first few rows of the dataset
-head(data)
-view(data)
+names(data)
 ```
-# Data Wrangling
+#Data Wrangling
 ```{r}
-# Correctly referencing and renaming the columns as necessary
+# Rename the columns as necessary and handle missing data and transformations
 data <- rename(data,
                Year_in_2023 = `What year were you in last year (2023) ?`,
                Drinks_Consumed = `On a night out, how many alcoholic drinks do you consume?`,
                Classes_Missed = `How many classes do you miss per week due to alcohol reasons, (i.e: being hungover or too tired?)`,
-               Socialising_Frequency = `How often do you go out partying/socialising during the week?`)
+               Socialising_Frequency = `How often do you go out partying/socialising during the week?`,
+               Avg_GPA = 'Your 2023 academic year average/GPA in % (Ignore if you are 2024 1st year student)')
 
-# Handling missing data and data transformation
 df <- data %>%
   mutate(
     Year_in_2023 = ifelse(is.na(Year_in_2023), "HS", Year_in_2023),
-    Drinks_Consumed = as.numeric(gsub("\\D", "", Drinks_Consumed)),  # Remove all non-digit characters and convert to numeric
+    Drinks_Consumed = as.numeric(gsub("\\D", "", Drinks_Consumed)),
     Socialising_Frequency = case_when(
       Socialising_Frequency == "Only weekends" ~ "3",
       TRUE ~ as.character(Socialising_Frequency)
@@ -42,44 +39,42 @@ df <- data %>%
     Socialising_Frequency = as.numeric(Socialising_Frequency)
   )
 
-# View the transformed data structure and first few rows to confirm changes
+# View the transformed data
 glimpse(df)
 head(df)
 ```
-
-Had to clean some of the data the data itself had a lot of differnt blanks and non nummerical values that we had to filiter out.
-# Data Visualization
+#Data Visulization
 ```{r}
+# Filter data and create visualizations
 df <- df %>%
   filter(!is.na(Drinks_Consumed), !is.na(Classes_Missed))
-
 df$Drinks_Consumed <- cut(df$Drinks_Consumed, breaks = c(-Inf, 3, 8, Inf), labels = c("1-3", "4-8", "8+"))
 
-ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
-    geom_bar(stat = "identity")+
-  labs(
-    x = "Drinks Consumed per night",
-    y = "Classes Missed",
-    title = "Bar Graph of Classes of Missed based on number of drinks consumed "
-  ) +
-  scale_x_discrete(limits = c("1-3", "4-8", "8+"))
+# Bar graph for classes missed
+ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed, fill = Drinks_Consumed)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Drinks Consumed per night", y = "Classes Missed", title = "Bar Graph of Classes Missed based on number of drinks consumed") +
+  scale_x_discrete(limits = c("1-3", "4-8", "8+")) +
+  scale_fill_manual(values = c("1-3" = "blue", "4-8" = "green", "8+" = "red"))
 
-```
+# Point plot for GPA and socializing frequency
+cleaned_df <- df %>%
+  filter(!is.na(Socialising_Frequency) & !is.na(Avg_GPA))
 
-###Smother
-```{r}
-# Ensure both columns are factors
-df$Drinks_Consumed <- as.factor(df$Drinks_Consumed)
-df$Classes_Missed <- as.factor(df$Classes_Missed)
+ggplot(cleaned_df, aes(x = Socialising_Frequency, y = Avg_GPA)) +
+  geom_point() +
+  labs(title = "Relationship Between Socialising Frequency and GPA", x = "Socialising Frequency", y = "GPA (%)") +
+  theme_minimal()
 
-# Perform Chi-square test
-chi_square_test <- chisq.test(df$Drinks_Consumed, df$Classes_Missed)
-chi_square_test
-
-print(df$Classes_Missed)
-
+# Density and histogram plots for GPA
+ggplot(cleaned_df, aes(x = `Avg_GPA`)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  labs(title = "Density Plot of GPA", x = "GPA (%)") +
+  theme_minimal()
+#Hex plot
 ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
   geom_hex() +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") + # Change colors here
   labs(
     title = "Hexbin Plot of Drinks Consumed vs. Classes Missed",
     x = "Drinks Consumed (Numeric Approximation)",
@@ -87,6 +82,61 @@ ggplot(df, aes(x = Drinks_Consumed, y = Classes_Missed)) +
   ) +
   theme_minimal()
 
-
+# Create a two-dimensional frequency table
+frequency_table <- with(df, table(Drinks_Consumed, Classes_Missed))
+ggplot(data, aes(x = Avg_GPA, fill = factor(Socialising_Frequency))) +
+  geom_dotplot(binaxis = 'x', stackdir = 'centerwhole', position = position_dodge(width = 0.75), dotsize = 0.5) +
+  scale_fill_brewer(palette = "Dark2", name = "Socialising Frequency") +
+  labs(
+    title = "Dot Plot of GPA by Socialising Frequency",
+    x = "GPA (%)",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.caption = element_text(size = 8)
+  ) +
+  guides(fill = guide_legend(override.aes = list(dotsize = 1.5)))
+# Group and summarize GPA by socializing frequency
+gpa_summary <- cleaned_df %>%
+  group_by(Socialising_Frequency) %>%
+  summarize(Mean_GPA = mean(Avg_GPA, na.rm = TRUE), Median_GPA = median(Avg_GPA, na.rm = TRUE), Min_GPA = min(Avg_GPA, na.rm = TRUE), Max_GPA = max(Avg_GPA, na.rm = TRUE), SD_GPA = sd(Avg_GPA, na.rm = TRUE), .groups = 'drop')
+print(gpa_summary)
 
 ```
+
+#Anylis of the grpahs
+
+Bar Graph of Classes Missed Based on Number of Drinks Consumed
+The bar graph indicates a clear positive correlation between the number of alcoholic drinks consumed and the number of classes missed. As the number of drinks increases, so does the number of classes missed, with those consuming 8+ drinks missing significantly more classes than those consuming fewer drinks. This suggests a direct impact of higher alcohol consumption on academic responsibilities.
+
+Relationship Between Socializing Frequency and GPA
+The scatter plot displays GPA against the frequency of socializing, with each dot representing a student's GPA. The distribution appears relatively consistent across socializing frequencies, suggesting no immediate or apparent impact of socializing frequency alone on GPA. However, a detailed statistical analysis would be needed to uncover any underlying patterns or relationships.
+
+Density Plot of GPA
+The density plot of GPA percentages shows a bimodal distribution, suggesting there are two distinct groups within the population. One peak is around the 60% mark, and another, less pronounced peak, around 80%. This could indicate the presence of two subgroups within the student population with different academic performance levels.
+
+Hex bin Plot of Drinks Consumed vs. Classes Missed
+This hex bin plot combines two variables: drinks consumed and classes missed, with the intensity of the color indicating the number of observations in each hexbin. The plot suggests that higher alcohol consumption is associated with a greater number of classes missed, reinforcing the pattern seen in the bar graph.
+
+Dot Plot of GPA by Socializing Frequency
+The dot plot shows individual GPA scores distributed across different levels of socializing frequency. The spread and density of dots across the GPA range are relatively even, implying that socializing frequency does not have a clear or strong impact on GPA in this data set.
+
+Table Summary of GPA by Socializing Frequency
+The table provides summary statistics for GPA across different socializing frequencies. Mean and median GPAs are relatively stable across the groups, suggesting that the frequency of socializing does not significantly affect the average academic performance, as indicated by GPA.
+
+#Conclusion
+From the visual and tabular data, there is a notable trend showing that increased alcohol consumption is associated with a higher likelihood of missing classes. This could imply a negative impact on academic engagement and potential for academic achievement. Conversely, the socializing frequency does not show a clear correlation with GPA, indicating that socializing per se, without considering other factors like alcohol consumption, might not be detrimental to academic performance. The bi modal distribution of GPA suggests that there could be underlying factors or distinct student sub populations that warrant further investigation.
+
+These findings underscore the complexity of the relationship between lifestyle choices and academic outcomes. While socializing in moderation does not inherently harm academic performance, excessive alcohol consumption appears to have a negative impact. This highlights the importance of responsible drinking habits for maintaining academic responsibilities. Further research should consider additional variables that may influence both GPA and class attendance, such as stress levels, academic motivation, and support networks.
+
+
+
+
+
+
+
