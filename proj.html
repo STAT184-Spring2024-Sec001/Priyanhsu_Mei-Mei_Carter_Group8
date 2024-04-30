@@ -422,7 +422,9 @@ glimpse(data)</code></pre>
 ## [15] &quot;Are you currently in a romantic relationship?&quot;                                                    
 ## [16] &quot;Do your parents approve alcohol consumption?&quot;                                                     
 ## [17] &quot;How strong is your relationship with your parent/s?&quot;</code></pre>
-<p>#Data Wrangling</p>
+</div>
+<div id="data-wrangling" class="section level1">
+<h1>Data Wrangling</h1>
 <pre class="r"><code># Rename the columns as necessary and handle missing data and transformations
 data &lt;- rename(data,
                Year_in_2023 = `What year were you in last year (2023) ?`,
@@ -483,7 +485,9 @@ glimpse(df)</code></pre>
 ## #   `Were you on scholarship/bursary in 2023?` &lt;chr&gt;,
 ## #   `Additional amount of studying (in hrs) per week` &lt;chr&gt;,
 ## #   Socialising_Frequency &lt;dbl&gt;, Drinks_Consumed &lt;dbl&gt;, Classes_Missed &lt;chr&gt;, …</code></pre>
-<p>#Data Visulization</p>
+</div>
+<div id="data-visulization" class="section level1">
+<h1>Data Visulization</h1>
 <pre class="r"><code># Filter data and create visualizations
 df &lt;- df %&gt;%
   filter(!is.na(Drinks_Consumed), !is.na(Classes_Missed))
@@ -559,7 +563,9 @@ print(gpa_summary)</code></pre>
 ## 2                     1     65.8         65      50    95.2   8.41
 ## 3                     2     66.6         65      50    85     8.60
 ## 4                     3     66.6         65      50    92     9.57</code></pre>
-<p>#Anylis of the grpahs</p>
+</div>
+<div id="analyses-of-the-grpahs" class="section level1">
+<h1>Analyses of the grpahs</h1>
 <p>Bar Graph of Classes Missed Based on Number of Drinks Consumed The
 bar graph indicates a clear positive correlation between the number of
 alcoholic drinks consumed and the number of classes missed. As the
@@ -596,13 +602,16 @@ summary statistics for GPA across different socializing frequencies.
 Mean and median GPAs are relatively stable across the groups, suggesting
 that the frequency of socializing does not significantly affect the
 average academic performance, as indicated by GPA.</p>
-<p>#Conclusion From the visual and tabular data, there is a notable
-trend showing that increased alcohol consumption is associated with a
-higher likelihood of missing classes. This could imply a negative impact
-on academic engagement and potential for academic achievement.
-Conversely, the socializing frequency does not show a clear correlation
-with GPA, indicating that socializing per se, without considering other
-factors like alcohol consumption, might not be detrimental to academic
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>From the visual and tabular data, there is a notable trend showing
+that increased alcohol consumption is associated with a higher
+likelihood of missing classes. This could imply a negative impact on
+academic engagement and potential for academic achievement. Conversely,
+the socializing frequency does not show a clear correlation with GPA,
+indicating that socializing per se, without considering other factors
+like alcohol consumption, might not be detrimental to academic
 performance. The bi modal distribution of GPA suggests that there could
 be underlying factors or distinct student sub populations that warrant
 further investigation.</p>

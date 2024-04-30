@@ -18,7 +18,7 @@ data <- read_csv("Stats survey.csv")
 glimpse(data)
 names(data)
 ```
-#Data Wrangling
+# Data Wrangling
 ```{r}
 # Rename the columns as necessary and handle missing data and transformations
 data <- rename(data,
@@ -43,7 +43,7 @@ df <- data %>%
 glimpse(df)
 head(df)
 ```
-#Data Visulization
+# Data Visulization
 ```{r}
 # Filter data and create visualizations
 df <- df %>%
@@ -109,7 +109,7 @@ print(gpa_summary)
 
 ```
 
-#Anylis of the grpahs
+# Analyses of the grpahs
 
 Bar Graph of Classes Missed Based on Number of Drinks Consumed
 The bar graph indicates a clear positive correlation between the number of alcoholic drinks consumed and the number of classes missed. As the number of drinks increases, so does the number of classes missed, with those consuming 8+ drinks missing significantly more classes than those consuming fewer drinks. This suggests a direct impact of higher alcohol consumption on academic responsibilities.
@@ -129,7 +129,7 @@ The dot plot shows individual GPA scores distributed across different levels of 
 Table Summary of GPA by Socializing Frequency
 The table provides summary statistics for GPA across different socializing frequencies. Mean and median GPAs are relatively stable across the groups, suggesting that the frequency of socializing does not significantly affect the average academic performance, as indicated by GPA.
 
-#Conclusion
+# Conclusion
 From the visual and tabular data, there is a notable trend showing that increased alcohol consumption is associated with a higher likelihood of missing classes. This could imply a negative impact on academic engagement and potential for academic achievement. Conversely, the socializing frequency does not show a clear correlation with GPA, indicating that socializing per se, without considering other factors like alcohol consumption, might not be detrimental to academic performance. The bi modal distribution of GPA suggests that there could be underlying factors or distinct student sub populations that warrant further investigation.
 
 These findings underscore the complexity of the relationship between lifestyle choices and academic outcomes. While socializing in moderation does not inherently harm academic performance, excessive alcohol consumption appears to have a negative impact. This highlights the importance of responsible drinking habits for maintaining academic responsibilities. Further research should consider additional variables that may influence both GPA and class attendance, such as stress levels, academic motivation, and support networks.
